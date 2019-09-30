@@ -1,0 +1,77 @@
+.button{
+	-fx-background-color: transparent ;
+}
+
+#sp_father{
+	-fx-background-image:url("../../src/images/67237021_107237430611221_4573949344843038720_n.jpg");
+	-fx-background-size:cover;
+	-fx-background-repeat:no-repeat;
+}
+
+#openfile{
+	-fx-background-image:url("../../src/images/folder1.png");
+	-fx-background-size:cover;
+	-fx-background-repeat:no-repeat;
+}
+
+#play{
+	-fx-background-image:url("../../src/images/play1.png");
+	-fx-background-size:cover;
+	-fx-background-repeat:no-repeat;
+}
+
+#pause{
+	-fx-background-image:url("../../src/images/pause1.png");
+	-fx-background-size:cover;
+	-fx-background-repeat:no-repeat;
+}
+
+#favo{
+	-fx-background-image:url('../../src/images/70459152_1229365424117645_8957797522995150848_n.png');
+	-fx-background-size:cover;
+	-fx-background-repeat:no-repeat;
+}
+#favo2{
+	-fx-background-image:url('../../src/images/70359132_2468142753430710_8626482212478386176_n.png');
+	-fx-background-size:cover;
+	-fx-background-repeat:no-repeat;
+}
+
+#nextpage{
+	-fx-background-image:url("../../src/images/nextarrow1.png");
+	-fx-background-size:cover;
+	-fx-background-repeat:no-repeat;
+}
+
+#backpage{
+	-fx-background-image:url("../../src/images/backarrow1.png");
+	-fx-background-size:cover;
+	-fx-background-repeat:no-repeat;
+}
+
+#fast{
+	-fx-background-image:url("../../src/images/fast1.png");
+	-fx-background-size:cover;
+	-fx-background-repeat:no-repeat;
+}
+
+#slow{
+	-fx-background-image:url("../../src/images/slow1.png");
+	-fx-background-size:cover;
+	-fx-background-repeat:no-repeat;
+}
+#listFavo{
+	-fx-background-image:url("../../src/images/70839478_405693096800712_297804038643122176_n.png");
+	-fx-background-size:cover;
+	-fx-background-repeat:no-repeat;
+}
+
+ScrollPane>VBox>Button {
+	-fx-background-color:black;
+}
+#replay{
+	-fx-background-image:url("../../src/images/70201030_971067966570184_7872493436580921344_n.png");
+	-fx-background-size:cover;
+	-fx-background-repeat:no-repeat;
+	
+}
