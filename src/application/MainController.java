@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -118,7 +120,7 @@ public class MainController implements Initializable{
 	//private Media me;
 	private String s_rmFv;//rmfv lưu string chứa path cần xóa video khỏi danh sách yêu thích
 	private double rate=1;
-	private String path;
+	String path;
 	private boolean ready= false;
 	private int id;
 	private int len;
@@ -126,7 +128,7 @@ public class MainController implements Initializable{
 	private String[] myFiles;
 	
 	
-	
+	private String ext;
 	private File file;
     private String[] st_favorite;
     private FileReader fwt;
@@ -157,7 +159,7 @@ public class MainController implements Initializable{
 			else {
 				ready=true;
 			}
-			String ext=file.getName().substring(file.getName().lastIndexOf('.')); //get extension trong file
+			ext=file.getName().substring(file.getName().lastIndexOf('.')); //get extension trong file
 			//System.out.println(file.getParent().toString());
 			dir=new File(file.getParent().toString());
 			myFiles=dir.list(new FilenameFilter() {
@@ -304,6 +306,7 @@ public class MainController implements Initializable{
 
 
 	public void run() throws IOException {
+		//path="https://nil1stest1null.000webhostapp.com/testAnull/Charlie%20Puth%20-%20Attention%20(%20cover%20by%20J.Fla%20).mp4";
 		for(String s:listFv) {	
 			if(s.equals(path)) {
 				s_rmFv=s;
@@ -316,6 +319,7 @@ public class MainController implements Initializable{
 			}
 		}
 		System.out.println(path);
+		isLyric=false;
 		rate=1;
 		bdp_lyric1.setVisible(false);
 		bdp_lyric2.setVisible(false);
@@ -326,7 +330,9 @@ public class MainController implements Initializable{
 		Media me = new Media(path);
 		mp = new MediaPlayer(me);
 		mv.setMediaPlayer(mp);
-		System.out.println(sp_father.getStyle());
+		mv.setCache(true);
+		//System.out.println(mv.getCacheHint().values().clone().toString());
+		//System.out.println(sp_father.getStyle());
 		DoubleProperty width = mv.fitWidthProperty();
 		DoubleProperty height = mv.fitHeightProperty();
 		width.bind(Bindings.selectDouble(mv.sceneProperty(), "width"));
@@ -439,9 +445,11 @@ public class MainController implements Initializable{
 					if(giay.length()==1) {
 						giay="0"+giay;
 					}
+					
+				String s_testTime=phut+giay;
 				if(isLyric) {
 					int_timeLyric=0;	
-					String s_testTime=phut+giay;
+					
 					//System.out.println(s_testTime);
 					//System.out.println(int_timeLyric);
 					for(ArrayList<String>s:lyricc) {
@@ -462,7 +470,16 @@ public class MainController implements Initializable{
 					if(file.getName().substring(file.getName().lastIndexOf('.')).equals(".mp3")) {
 						setLyricMp3(lyricc);
 					}else {
+						try {
+						if(Integer.parseInt(s_testTime)>=Integer.parseInt(lyricc.get(0).get(0).replace(":", ""))) {
 						setLyricMp4(lyricc);
+						}else {
+							lb_lyricInBdp2.setText("");
+						}
+						}catch (Exception e) {
+							// TODO: handle exception
+							//loi out of bounds
+						}
 					}
 					
 				}
@@ -863,7 +880,9 @@ public class MainController implements Initializable{
     	}
     }
   
-    
+    public void setPath(String path) {
+    	this.path=path;
+    }
 
     private void checkId(Button button) {
         path=button.getId().toString();
@@ -953,7 +972,172 @@ public class MainController implements Initializable{
     public void setLyricMp4(ArrayList<ArrayList<String>> lyricc) {
     	lb_lyricInBdp2.setText(lyricc.get(int_timeLyric).get(1));
     }
+    
+    public void runOnline() throws IOException {
+    	if(ready==true) {
+    		mp.stop();
+    		mp.dispose();
+    		
+    	}else {
+    		ready=true;
+    	}
+    	System.out.println(path);
 
+    	try {
+			ext = Paths.get(new URI(path).getPath()).getName(0).toString();
+			System.out.println(ext);
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	vb_inBdp.setOnMouseExited(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				ex();
+			}
+		});
+    	rate=1;
+		bdp_lyric1.setVisible(false);
+		bdp_lyric2.setVisible(false);
+		lb_rate.setText("x"+Double.toString(rate));
+		play.setVisible(false);
+		bdp_feature.setStyle("-fx-opacity:0");
+		pause.setVisible(true);
+		Media me = new Media(path);
+		mp = new MediaPlayer(me);
+		mv.setMediaPlayer(mp);
+		mv.setCache(true);
+		DoubleProperty width = mv.fitWidthProperty();
+		DoubleProperty height = mv.fitHeightProperty();
+		width.bind(Bindings.selectDouble(mv.sceneProperty(), "width"));
+		height.bind(Bindings.selectDouble(mv.sceneProperty(), "height"));
+		mp.setAutoPlay(true);
+		mp.setVolume(0.5);
+		sl.setMin(0);
+		sl.setMax(100);
+		sl.setValue(50);
+		//System.out.println(mp.getStatus());
+		sl.valueProperty().addListener(new ChangeListener<Number>() {
+			 
+	        @Override
+	        public void changed(ObservableValue<? extends Number> observable, //
+	                Number oldValue, Number newValue) {
+	
+	        	mp.setVolume(sl.getValue()/100);
+	        }
+		});
+		
+		seeksl.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			
+			@Override
+			public void handle(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				mp.seek(Duration.millis(seeksl.getValue()*(mp.getTotalDuration().toMillis()/100)));
+				
+			
+			}
+		});
+		int_timeLyric=0;
+		sp_father.setStyle("-fx-background-color:black;-fx-background-image:none");
+		if(ext.equals("mp3")) {
+			sp_father.setStyle("-fx-background-image:url(\"./images/vinilovyj_proigryvatel_vinil_plastinka_103512_1280x720.jpg\");");
+			bdp_lyric1.setVisible(true);
+			bdp_lyric2.setVisible(false);
+		}else {
+			bdp_lyric1.setVisible(false);
+			bdp_lyric2.setVisible(true);
+		}
+
+		isLyric=true;
+		ArrayList<ArrayList<String>> lyricc=new ArrayList<ArrayList<String>>();
+		BufferedReader in=null;
+		InputStreamReader ip_reader=null;
+		try {
+	    URL oracle = new URL(path.replace(".mp4", ".txt").replace(".mp3", ".txt"));
+	    ip_reader=new InputStreamReader(oracle.openStream(),"UTF-8");
+	    in= new BufferedReader(ip_reader);
+		}catch (Exception e) {
+			// TODO: handle exception
+			isLyric=false;
+		}
+	    String inputLine;
+	    
+	    while ((inputLine = in.readLine()) != null) {
+	        //System.out.println(inputLine);
+	        ArrayList<String> lr=new ArrayList<String>();
+			  lr.add(inputLine);
+			  //System.out.println(line);
+			  inputLine=in.readLine();
+			  lr.add(inputLine);
+			  //System.out.println(line);
+			  lyricc.add(lr);
+	  	}
+	    
+	    in.close();
+		ip_reader.close();
+		
+		mp.currentTimeProperty().addListener((ChangeListener<? super Duration>) new ChangeListener<Duration>() {
+			@Override
+			public void changed(ObservableValue<? extends Duration> arg0, Duration arg1, Duration arg2) {
+					String phut=Integer.toString((int)mp.getCurrentTime().toMinutes());
+					String giay=Integer.toString(((int)mp.getCurrentTime().toSeconds())%60);
+					if(phut.length()==1) {
+						phut="0"+phut;
+					}
+					
+					if(giay.length()==1) {
+						giay="0"+giay;
+					}
+				String s_testTime=phut+giay;
+				if(isLyric) {
+					int_timeLyric=0;	
+					for(ArrayList<String>s:lyricc) {
+						if(Integer.parseInt(s_testTime)>=Integer.parseInt(s.get(0).replace(":",""))&&int_timeLyric<lyricc.size()-1) {
+							int_timeLyric+=1;
+						}else {
+							if(int_timeLyric>0&&int_timeLyric<lyricc.size()-1) {
+							int_timeLyric-=1;}
+							//System.out.println(int_timeLyric);
+							break;
+						}
+					}
+					
+					
+					if(ext.equals("mp3")) {
+						setLyricMp3(lyricc);
+					}else {
+						try {
+						if(Integer.parseInt(s_testTime)>=Integer.parseInt(lyricc.get(0).get(0).replace(":", ""))) {
+						setLyricMp4(lyricc);
+						}else {
+							lb_lyricInBdp2.setText("");
+						}
+						}catch (Exception e) {
+							// TODO: handle exception
+							//loi out of bounds
+						}
+					}	
+				}
+				lb_time.setText(phut+":"+giay);
+				seeksl.setValue((mp.getCurrentTime().toMillis()/(mp.getStopTime().toMillis()))*100);
+			}
+			
+		});
+		mp.setOnEndOfMedia(new Runnable() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				play.setVisible(false);
+				pause.setVisible(false);
+				replay.setVisible(true);
+			}
+		});
+    	
+    }
+    
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
     	
@@ -1000,5 +1184,6 @@ public class MainController implements Initializable{
 				
 			}
 		});
+    	
 	}
 }
