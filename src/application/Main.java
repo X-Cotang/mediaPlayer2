@@ -104,7 +104,7 @@ public class Main extends Application {
 				}
 			});
 			*/
-	        System.out.println(controller);
+	        //System.out.println(controller);
 	        primaryStage.getIcons().add(new Image("/images/51169520_1162196227295479_5589004336278536192_n.png"));
 	        primaryStage.show();
 	        
@@ -119,7 +119,7 @@ public class Main extends Application {
 			stage2.initStyle(StageStyle.UNDECORATED);
 			//String path;
 			scene.setOnKeyPressed((KeyEvent event) -> {
-	            System.out.println(event.getCode().toString()=="M");
+	            //System.out.println(event.getCode().toString()=="M");
 	            if(event.getCode().toString()=="U") {
 	            	stage2.show();
 	            	//while(stage2.isShowing()) {
