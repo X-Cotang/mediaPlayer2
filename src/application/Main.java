@@ -1,6 +1,7 @@
 package application;
 	
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 
 import javax.swing.event.ChangeListener;
@@ -142,7 +143,10 @@ public class Main extends Application {
 								} catch (IOException e) {
 									// TODO Auto-generated catch block
 									//e.printStackTrace();
-									
+									alert.setTitle("Error");
+							        alert.setHeaderText(null);
+							        alert.setContentText("Lỗi Kết Nối");
+							        alert.showAndWait();
 								}
 								stage2.close();
 							}
@@ -166,7 +170,12 @@ public class Main extends Application {
     { 
         /* Try creating a valid URL */
         try { 
-            new URL(url).toURI(); 
+            new URL(url).toURI();
+            URI test=new URI(url);
+            System.out.println(test.getHost());
+            if(!test.getHost().equals("nil1stest1null.000webhostapp.com")) {
+            	return false;
+            }
             return true; 
         } 
           
@@ -174,6 +183,7 @@ public class Main extends Application {
         // while creating URL object 
         catch (Exception e) { 
             return false; 
-        } 
+        }
+        
     } 
 }

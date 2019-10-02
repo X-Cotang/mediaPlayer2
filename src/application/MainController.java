@@ -36,11 +36,13 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -136,13 +138,18 @@ public class MainController implements Initializable{
 	private List<String> listFv;
 	private int int_timeLyric;
 	private boolean isLyric=false;
-	
+	Alert alert;
 	public void openfile(ActionEvent event) {
+		
 		rate=1;
 		FileChooser filechooser = new FileChooser();
 		FileChooser.ExtensionFilter filter=new FileChooser.ExtensionFilter("Select file mp4", "*.mp4","*.mp3");
 		filechooser.getExtensionFilters().add(filter);
-		file = filechooser.showOpenDialog(null);
+		//file = filechooser.showOpenDialog(null);
+		File file2 = filechooser.showOpenDialog(null);
+		if(file2!=null) {
+			file=file2;
+		
 		try {
 			path = file.toURI().toString();
 		} catch (Exception e) {
@@ -181,7 +188,7 @@ public class MainController implements Initializable{
 			}
 		}
 	}
-	
+	}
 	
 	
 	private void setNode(boolean isFv) {
@@ -414,7 +421,12 @@ public class MainController implements Initializable{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}else {isLyric=false;lb_lyricMain.setVisible(false);}
+		}else {
+			isLyric=false;
+			//lb_lyricMain.setVisible(false);
+		}
+		
+		
 		
 		
 		mp.currentTimeProperty().addListener((ChangeListener<? super Duration>) new ChangeListener<Duration>() {
@@ -973,7 +985,39 @@ public class MainController implements Initializable{
     	lb_lyricInBdp2.setText(lyricc.get(int_timeLyric).get(1));
     }
     
-    public void runOnline() throws IOException {
+    public boolean runOnline() throws IOException {
+    	isLyric=true;
+		ArrayList<ArrayList<String>> lyricc=new ArrayList<ArrayList<String>>();
+		BufferedReader in=null;
+		InputStreamReader ip_reader=null;
+		try {
+		    URL oracle = new URL(path.replace(".mp4", ".txt").replace(".mp3", ".txt"));
+		    ip_reader=new InputStreamReader(oracle.openStream(),"UTF-8");
+		    in= new BufferedReader(ip_reader);
+		    String inputLine;
+		    
+		    while ((inputLine = in.readLine()) != null) {
+		        //System.out.println(inputLine);
+		    	
+		        ArrayList<String> lr=new ArrayList<String>();
+				  lr.add(inputLine);
+				  //System.out.println(line);
+				  inputLine=in.readLine();
+				  lr.add(inputLine);
+				  //System.out.println(line);
+				  lyricc.add(lr);
+		  	}
+		    in.close();
+			ip_reader.close();
+		}catch (Exception e) {
+			// TODO: handle exception
+			alert.setTitle("warning");
+	        alert.setHeaderText(null);
+	        alert.setContentText("Không tìm thấy địa chỉ");
+	        alert.showAndWait();
+			isLyric=false;
+			return false;
+		}
     	if(ready==true) {
     		mp.stop();
     		mp.dispose();
@@ -1001,6 +1045,8 @@ public class MainController implements Initializable{
     	rate=1;
 		bdp_lyric1.setVisible(false);
 		bdp_lyric2.setVisible(false);
+		bt_Fv.setVisible(false);
+		bt_unFv.setVisible(true);
 		lb_rate.setText("x"+Double.toString(rate));
 		play.setVisible(false);
 		bdp_feature.setStyle("-fx-opacity:0");
@@ -1050,33 +1096,10 @@ public class MainController implements Initializable{
 			bdp_lyric2.setVisible(true);
 		}
 
-		isLyric=true;
-		ArrayList<ArrayList<String>> lyricc=new ArrayList<ArrayList<String>>();
-		BufferedReader in=null;
-		InputStreamReader ip_reader=null;
-		try {
-	    URL oracle = new URL(path.replace(".mp4", ".txt").replace(".mp3", ".txt"));
-	    ip_reader=new InputStreamReader(oracle.openStream(),"UTF-8");
-	    in= new BufferedReader(ip_reader);
-		}catch (Exception e) {
-			// TODO: handle exception
-			isLyric=false;
-		}
-	    String inputLine;
+		
 	    
-	    while ((inputLine = in.readLine()) != null) {
-	        //System.out.println(inputLine);
-	        ArrayList<String> lr=new ArrayList<String>();
-			  lr.add(inputLine);
-			  //System.out.println(line);
-			  inputLine=in.readLine();
-			  lr.add(inputLine);
-			  //System.out.println(line);
-			  lyricc.add(lr);
-	  	}
 	    
-	    in.close();
-		ip_reader.close();
+	    
 		
 		mp.currentTimeProperty().addListener((ChangeListener<? super Duration>) new ChangeListener<Duration>() {
 			@Override
@@ -1135,12 +1158,12 @@ public class MainController implements Initializable{
 				replay.setVisible(true);
 			}
 		});
-    	
+    	return true;
     }
     
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-    	
+		alert = new Alert(AlertType.INFORMATION);
     	hb_father.setVisible(false); //hiện feature khi khỏi chạy
     	bt_Fv.setVisible(false);	//ẩn nút trái tim hồng khi khởi chạy
     	scrP_fvVideo.setHbarPolicy(ScrollBarPolicy.NEVER);        //ẩn thanh kéo ngang
